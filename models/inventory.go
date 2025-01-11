@@ -1,18 +1,12 @@
 package models
 
-import (
-    "time"
-)
+import "time"
 
 type Inventory struct {
-    ItemID     int       `gorm:"primaryKey"`
-    ItemName   string    `gorm:"size:255;not null"`
-    Type       string    `gorm:"size:255;not null"`
-    Stock      int       `gorm:"not null"`
-    Price      int       `gorm:"not null"`
-    CreatedAt  time.Time `gorm:"autoCreateTime"`
-    UpdatedAt  time.Time `gorm:"autoUpdateTime"`
-    BatchID    int       `gorm:"not null"`
-    Satuan     string    `gorm:"size:15;not null"`
-    Notes      string    `gorm:"size:255"`
+	ID         uint       `gorm:"primaryKey"`
+	ProductID  uint       `gorm:"not null" json:"product_id" binding:"required"`
+	BatchCode  string     `gorm:"type:varchar(100);not null" json:"batch_code" binding:"required"`
+	Quantity   int        `gorm:"not null;default:0" json:"quantity" binding:"required,gte=0"`
+	CreatedAt  time.Time  `json:"created_at"`
+	ExpiredAt  *time.Time `json:"expired_at"`
 }
