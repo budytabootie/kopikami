@@ -43,54 +43,73 @@ func (s *productService) GetAllProducts() ([]models.Product, error) {
 
 // CreateProduct menambahkan produk baru dengan validasi stok tidak negatif
 func (s *productService) CreateProduct(input ProductInput) (*models.Product, error) {
-	if input.Stock < 0 {
-		return nil, errors.New("stock cannot be negative")
-	}
+    if input.Stock < 0 {
+        return nil, errors.New("stock cannot be negative")
+    }
 
-	product := models.Product{
-		Name:  input.Name,
-		Price: input.Price,
-		Stock: input.Stock,
-	}
+    product := models.Product{
+        Name:  input.Name,
+        Price: input.Price,
+        Stock: input.Stock,
+    }
 
-	if err := s.productRepo.Create(&product); err != nil {
-		return nil, err
-	}
+    if err := s.productRepo.Create(&product); err != nil {
+        return nil, err
+    }
 
-	return &product, nil
+    // ✅ Tambahkan log stok awal ke inventory_logs
+    if input.Stock > 0 {
+        log := models.InventoryLog{
+            Type:         "product",
+            ReferenceID:  product.ID,
+            ChangeAmount: input.Stock,
+            Description:  "Initial stock added via product creation",
+        }
+        if err := s.inventoryRepo.Create(&log); err != nil {
+            return nil, errors.New("failed to create inventory log")
+        }
+    }
+
+    return &product, nil
 }
+
 
 // UpdateProduct memperbarui data produk yang sudah ada berdasarkan ID
 func (s *productService) UpdateProduct(id uint, input ProductInput) (*models.Product, error) {
-	product, err := s.productRepo.FindByID(id)
-	if err != nil {
-		return nil, errors.New("product not found")
-	}
+    product, err := s.productRepo.FindByID(id)
+    if err != nil {
+        return nil, errors.New("product not found")
+    }
 
-	stockChange := input.Stock - product.Stock
-	product.Name = input.Name
-	product.Price = input.Price
-	product.Stock = input.Stock
+    // Hitung perubahan stok
+    stockChange := input.Stock - product.Stock
 
-	if err := s.productRepo.Update(&product); err != nil {
-		return nil, err
-	}
+    // Perbarui data produk
+    product.Name = input.Name
+    product.Price = input.Price
+    product.Stock = input.Stock
 
-	// Tambahkan log penambahan stok ke inventory_logs
-	if stockChange > 0 {
-		log := models.InventoryLog{
-			Type:         "product",
-			ReferenceID:  product.ID,
-			ChangeAmount: stockChange,
-			Description:  "Stock addition via product update",
-		}
-		if err := s.inventoryRepo.Create(&log); err != nil {
-			return nil, errors.New("failed to create inventory log")
-		}
-	}
+    if err := s.productRepo.Update(&product); err != nil {
+        return nil, err
+    }
 
-	return &product, nil
+    // Tambahkan log ke inventory_logs jika ada perubahan stok
+    if stockChange != 0 {
+        log := models.InventoryLog{
+            Type:         "product",
+            ReferenceID:  product.ID,
+            ChangeAmount: stockChange,
+            Description:  "Stock updated via product update",
+        }
+        if err := s.inventoryRepo.Create(&log); err != nil {
+            return nil, errors.New("failed to create inventory log")
+        }
+    }
+
+    return &product, nil
 }
+
+
 
 // DeleteProduct menghapus produk dari database berdasarkan ID
 func (s *productService) DeleteProduct(id uint) error {

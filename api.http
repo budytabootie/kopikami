@@ -1,127 +1,128 @@
-### 1. Register User
+### Pembuatan User Baru
 POST http://localhost:8080/api/auth/register
 Content-Type: application/json
 
 {
-  "name": "John Doee",
-  "email": "john.doe@example.com",
+  "name": "Admin User",
+  "email": "admin@example.com",
   "password": "password123",
   "role": "admin"
 }
 
 ###
 
-### 2. Login User (Get JWT Token)
+### Login User (Mendapatkan Token JWT)
 POST http://localhost:8080/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "john.doe@example.com",
+  "email": "admin@example.com",
   "password": "password123"
 }
 
 ###
 
-### 3. Add Product (Requires Admin Role)
+### Menambahkan Produk
 POST http://localhost:8080/api/products
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxODkwODV9.BUvFbkHVIpikOqItwk51rlwtCzYuZR4yu8u6I0THoqc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxOTk0NjZ9.-hrb5vlrvcmAc3fM6JmW81R7Fv7f8cruuvjeiowixxs
 
 {
-  "name": "Espresso Jawa",
-  "price": 30000,
+  "name": "Espresso",
+  "price": 25000,
   "stock": 100
 }
 
 ###
 
-### 4. Add Raw Material (Requires Admin Role)
+### Menambahkan Raw Material
 POST http://localhost:8080/api/raw-materials
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxODkwODV9.BUvFbkHVIpikOqItwk51rlwtCzYuZR4yu8u6I0THoqc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxOTk0NjZ9.-hrb5vlrvcmAc3fM6JmW81R7Fv7f8cruuvjeiowixxs
 
 {
-  "name": "Coffee Beans",
-  "unit_of_measurement": "gram",
-  "description": "Premium Arabica coffee beans"
+  "name": "Kopi Arabika",
+  "unit_of_measurement": "kg",
+  "description": "Biji kopi Arabika berkualitas"
 }
 
 ###
 
-### 5. Add Raw Material Batch (Requires Admin Role)
+### Menambahkan Batch Raw Material
 POST http://localhost:8080/api/raw-material-batches
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxODkwODV9.BUvFbkHVIpikOqItwk51rlwtCzYuZR4yu8u6I0THoqc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxOTk0NjZ9.-hrb5vlrvcmAc3fM6JmW81R7Fv7f8cruuvjeiowixxs
 
 {
   "raw_material_id": 1,
-  "batch_code": "BATCH002",
-  "quantity": 500,
-  "received_date": "2025-01-10 00:00:00"
+  "batch_code": "BATCH001",
+  "quantity": 50,
+  "received_date": "2025-01-17 00:00:00"
 }
 
 ###
 
-### 6. Add Product Recipe (Requires Admin Role)
+### Menambahkan Resep Produk
 POST http://localhost:8080/api/product-recipes
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxODkwODV9.BUvFbkHVIpikOqItwk51rlwtCzYuZR4yu8u6I0THoqc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxOTk0NjZ9.-hrb5vlrvcmAc3fM6JmW81R7Fv7f8cruuvjeiowixxs
 
 {
   "product_id": 1,
   "raw_material_id": 1,
-  "quantity": 50
+  "quantity": 1
 }
 
 ###
 
-### 7. Create Transaction (Requires Admin Role)
+### Melakukan Transaksi
 POST http://localhost:8080/api/transactions
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxODkwODV9.BUvFbkHVIpikOqItwk51rlwtCzYuZR4yu8u6I0THoqc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxOTk0NjZ9.-hrb5vlrvcmAc3fM6JmW81R7Fv7f8cruuvjeiowixxs
 
 {
   "user_id": 1,
   "items": [
     {
       "product_id": 1,
-      "quantity": 3
+      "quantity": 2
     }
   ]
 }
 
-### Get Current Stock for Raw Material
-GET http://localhost:8080/api/inventory?type=raw_material&reference_id=1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxODkwODV9.BUvFbkHVIpikOqItwk51rlwtCzYuZR4yu8u6I0THoqc
-
 ###
 
-### 8. Get All Transactions (Requires Admin Role)
+### Melihat Semua Transaksi
 GET http://localhost:8080/api/transactions
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxODkwODV9.BUvFbkHVIpikOqItwk51rlwtCzYuZR4yu8u6I0THoqc
-
-###
-PUT http://localhost:8080/api/products/1
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxODIxNTJ9.P_krgHaqm3Z_uQUSznVWSWrmD5o8f_b8R1teAszIgWk
-
-{
-  "name": "Espresso",
-  "price": 30000,
-  "stock": 100
-}
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxOTk0NjZ9.-hrb5vlrvcmAc3fM6JmW81R7Fv7f8cruuvjeiowixxs
 
 ###
 
-POST http://localhost:8080/api/raw-material-batches
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxODIxNTJ9.P_krgHaqm3Z_uQUSznVWSWrmD5o8f_b8R1teAszIgWk
-
-{
-  "raw_material_id": 1,
-  "batch_code": "BATCH_NEW",
-  "quantity": 200,
-  "received_date": "2025-01-17 00:00:00"
-}
+### Mengecek Stok Produk
+GET http://localhost:8080/api/inventory?type=product&reference_id=1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxOTk0NjZ9.-hrb5vlrvcmAc3fM6JmW81R7Fv7f8cruuvjeiowixxs
 
 
+### Mengecek Stok Raw Material
+GET http://localhost:8080/api/inventory?type=raw_material&reference_id=1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxOTk0NjZ9.-hrb5vlrvcmAc3fM6JmW81R7Fv7f8cruuvjeiowixxs
+
+###
+
+### Melihat Laporan Penjualan
+GET http://localhost:8080/api/reports/sales
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxOTk0NjZ9.-hrb5vlrvcmAc3fM6JmW81R7Fv7f8cruuvjeiowixxs
+
+start_date: 2025-01-01
+end_date: 2025-01-17
+
+###
+GET http://localhost:8080/api/reports/sales?start_date=2025-01-01&end_date=2025-01-17
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxOTk0NjZ9.-hrb5vlrvcmAc3fM6JmW81R7Fv7f8cruuvjeiowixxs
+
+
+###
+
+### Melihat Laporan Stok
+GET http://localhost:8080/api/reports/stock
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxOTk0NjZ9.-hrb5vlrvcmAc3fM6JmW81R7Fv7f8cruuvjeiowixxs

@@ -22,7 +22,7 @@ func NewInventoryLogRepository(db *gorm.DB) InventoryLogRepository {
 }
 
 func (r *inventoryLogRepository) Create(log *models.InventoryLog) error {
-	return r.db.Create(log).Error
+    return r.db.Create(log).Error
 }
 
 func (r *inventoryLogRepository) FindAll() ([]models.InventoryLog, error) {
@@ -32,13 +32,14 @@ func (r *inventoryLogRepository) FindAll() ([]models.InventoryLog, error) {
 }
 
 func (r *inventoryLogRepository) GetCurrentStockByTypeAndID(logType string, referenceID uint) (int, error) {
-	var total int
-	err := r.db.Model(&models.InventoryLog{}).
-		Select("SUM(change_amount)").
-		Where("type = ? AND reference_id = ?", logType, referenceID).
-		Scan(&total).Error
-	return total, err
+    var stock int
+    err := r.db.Raw(`
+        SELECT COALESCE(SUM(change_amount), 0) 
+        FROM inventory_logs 
+        WHERE type = ? AND reference_id = ?`, logType, referenceID).Scan(&stock).Error
+    return stock, err
 }
+
 
 func (r *inventoryLogRepository) GetBatchesByRawMaterialID(rawMaterialID uint) ([]models.RawMaterialBatch, error) {
     var batches []models.RawMaterialBatch

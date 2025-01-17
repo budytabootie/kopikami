@@ -12,11 +12,12 @@ type Transaction struct {
 }
 
 type TransactionItem struct {
-	ID            uint    `gorm:"primaryKey"`
-	TransactionID uint    `gorm:"not null"`
-	ProductID     uint    `gorm:"not null"`
-	Quantity      int     `gorm:"not null"`
-	Price         float64 `gorm:"not null"`
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
+    ID            uint      `gorm:"primaryKey"`
+    TransactionID uint      `gorm:"not null"`
+    ProductID     uint      `gorm:"not null"`
+    Product       *Product  `gorm:"foreignKey:ProductID"` // Tambahkan relasi ke Product
+    Quantity      int       `gorm:"not null"`
+    Price         float64   `gorm:"not null"`
+    CreatedAt     time.Time
+    UpdatedAt     time.Time
 }

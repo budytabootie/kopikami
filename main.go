@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"kopikami/config"
 	"kopikami/controllers"
 	"kopikami/middlewares"
@@ -11,6 +13,9 @@ import (
 )
 
 func main() {
+	// Set timezone lokal
+	time.Local = time.FixedZone("WIB", 7*3600) // Contoh untuk GMT+7 (WIB)
+
 	db := config.SetupDatabaseConnection()
 	defer config.CloseDatabaseConnection(db)
 
@@ -22,6 +27,7 @@ func main() {
 	productRecipeRepo := repositories.NewProductRecipeRepository(db)
 	inventoryRepo := repositories.NewInventoryLogRepository(db)
 	transactionRepo := repositories.NewTransactionRepository(db)
+	reportRepo := repositories.NewReportRepository(db)
 
 	// Services
 	authService := services.NewAuthService(userRepo)
@@ -31,6 +37,7 @@ func main() {
 	productRecipeService := services.NewProductRecipeService(productRecipeRepo, productRepo, rawMaterialRepo)
 	inventoryService := services.NewInventoryService(inventoryRepo)
 	transactionService := services.NewTransactionService(transactionRepo, productRepo, inventoryRepo, productRecipeRepo, rawMaterialRepo)
+	reportService := services.NewReportService(reportRepo)
 
 	// Controllers
 	authController := controllers.NewAuthController(authService)
@@ -40,6 +47,7 @@ func main() {
 	productRecipeController := controllers.NewProductRecipeController(productRecipeService)
 	inventoryController := controllers.NewInventoryController(inventoryService)
 	transactionController := controllers.NewTransactionController(transactionService)
+	reportController := controllers.NewReportController(reportService)
 
 	router := gin.Default()
 
@@ -81,6 +89,10 @@ func main() {
 	// ✅ Transaction Routes
 	protected.POST("/transactions", transactionController.CreateTransaction)
 	protected.GET("/transactions", transactionController.GetAllTransactions)
+
+	// ✅ Report Routes
+	protected.GET("/reports/sales", reportController.GetSalesReport)
+	protected.GET("/reports/stock", reportController.GetStockReport)
 
 	// Jalankan server di port 8080
 	router.Run(":8080")

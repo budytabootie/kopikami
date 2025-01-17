@@ -57,6 +57,7 @@ func (s *transactionService) CreateTransaction(input TransactionInput) (*models.
 			return nil, errors.New("product not found")
 		}
 
+		// Validasi stok produk
 		if product.Stock < item.Quantity {
 			return nil, errors.New("insufficient product stock")
 		}
@@ -66,6 +67,17 @@ func (s *transactionService) CreateTransaction(input TransactionInput) (*models.
 		err = s.productRepo.Update(&product)
 		if err != nil {
 			return nil, errors.New("failed to update product stock")
+		}
+
+		// Tambahkan log ke inventory_logs
+		log := models.InventoryLog{
+			Type:         "product",
+			ReferenceID:  product.ID,
+			ChangeAmount: -item.Quantity,
+			Description:  "Stock reduction for transaction",
+		}
+		if err := s.inventoryRepo.Create(&log); err != nil {
+			return nil, errors.New("failed to create inventory log for product")
 		}
 
 		// Tambahkan item ke transaksi
