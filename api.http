@@ -1,128 +1,127 @@
+### 1. Register User
 POST http://localhost:8080/api/auth/register
 Content-Type: application/json
 
 {
-  "name": "John Doe 2",
-  "email": "john2@example.com",
+  "name": "John Doee",
+  "email": "john.doe@example.com",
   "password": "password123",
   "role": "admin"
 }
 
 ###
 
-@token = "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzY3NDk5NzJ9.c0aNoEkhPlqho3JaVcYUAJutNrE3f3vvfau61eg9v2w"
+### 2. Login User (Get JWT Token)
 POST http://localhost:8080/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "john2@example.com",
+  "email": "john.doe@example.com",
   "password": "password123"
 }
 
 ###
 
-GET http://localhost:8080/api/products
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzY3NTA2NTd9.HIMryC2N4ZowWAy4QAJtarkXXgWsRF7CWSsPDvYnIY8
-
-###
+### 3. Add Product (Requires Admin Role)
 POST http://localhost:8080/api/products
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzY3NTA2NTd9.HIMryC2N4ZowWAy4QAJtarkXXgWsRF7CWSsPDvYnIY8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxODkwODV9.BUvFbkHVIpikOqItwk51rlwtCzYuZR4yu8u6I0THoqc
+
+{
+  "name": "Espresso Jawa",
+  "price": 30000,
+  "stock": 100
+}
+
+###
+
+### 4. Add Raw Material (Requires Admin Role)
+POST http://localhost:8080/api/raw-materials
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxODkwODV9.BUvFbkHVIpikOqItwk51rlwtCzYuZR4yu8u6I0THoqc
+
+{
+  "name": "Coffee Beans",
+  "unit_of_measurement": "gram",
+  "description": "Premium Arabica coffee beans"
+}
+
+###
+
+### 5. Add Raw Material Batch (Requires Admin Role)
+POST http://localhost:8080/api/raw-material-batches
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxODkwODV9.BUvFbkHVIpikOqItwk51rlwtCzYuZR4yu8u6I0THoqc
+
+{
+  "raw_material_id": 1,
+  "batch_code": "BATCH002",
+  "quantity": 500,
+  "received_date": "2025-01-10 00:00:00"
+}
+
+###
+
+### 6. Add Product Recipe (Requires Admin Role)
+POST http://localhost:8080/api/product-recipes
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxODkwODV9.BUvFbkHVIpikOqItwk51rlwtCzYuZR4yu8u6I0THoqc
+
+{
+  "product_id": 1,
+  "raw_material_id": 1,
+  "quantity": 50
+}
+
+###
+
+### 7. Create Transaction (Requires Admin Role)
+POST http://localhost:8080/api/transactions
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxODkwODV9.BUvFbkHVIpikOqItwk51rlwtCzYuZR4yu8u6I0THoqc
+
+{
+  "user_id": 1,
+  "items": [
+    {
+      "product_id": 1,
+      "quantity": 3
+    }
+  ]
+}
+
+### Get Current Stock for Raw Material
+GET http://localhost:8080/api/inventory?type=raw_material&reference_id=1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxODkwODV9.BUvFbkHVIpikOqItwk51rlwtCzYuZR4yu8u6I0THoqc
+
+###
+
+### 8. Get All Transactions (Requires Admin Role)
+GET http://localhost:8080/api/transactions
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxODkwODV9.BUvFbkHVIpikOqItwk51rlwtCzYuZR4yu8u6I0THoqc
+
+###
+PUT http://localhost:8080/api/products/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxODIxNTJ9.P_krgHaqm3Z_uQUSznVWSWrmD5o8f_b8R1teAszIgWk
 
 {
   "name": "Espresso",
   "price": 30000,
-  "stock": 100 
+  "stock": 100
 }
 
 ###
 
-PUT http://localhost:8080/api/products/3
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzY3NTA2NTd9.HIMryC2N4ZowWAy4QAJtarkXXgWsRF7CWSsPDvYnIY8
-
-{
-  "name": "Espresso Baru",
-  "price": 35000,
-  "stock": 90
-}
-
-###
-
-DELETE http://localhost:8080/api/products/3
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzY2ODAxODB9.rbDg5XuOKw9YLvPi66CnCzOEWChBbHKquuhfXW_KV6M
-
-###
-
-# Raw Material Management Testing
-
-### Register User
-POST http://localhost:8080/api/auth/register
-Content-Type: application/json
-
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "password123",
-  "role": "admin"
-}
-
-### Login User (Get JWT Token)
-POST http://localhost:8080/api/auth/login
-Content-Type: application/json
-
-{
-  "email": "john@example.com",
-  "password": "password123"
-}
-
-### Add Raw Material (Protected)
-POST http://localhost:8080/api/raw-materials
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzY3MDI2Njd9.HB4VXaDdXIM5DioU5Tyl2_eHK6MlKbBwRNsNN4-3fg8
-
-{
-  "name": "Kopi Arabika",
-  "unit_of_measurement": "gram",
-  "description": "Biji kopi Arabika berkualitas tinggi"
-}
-
-### Get All Raw Materials (Protected)
-GET http://localhost:8080/api/raw-materials
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzY3MDM1MDB9.js-X2xIOYiKpiMTUuckqtPazURGgIIRyGQEp0IOPLX0
-
-### Update Raw Material (Protected)
-PUT http://localhost:8080/api/raw-materials/2
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzY3MDM1MDB9.js-X2xIOYiKpiMTUuckqtPazURGgIIRyGQEp0IOPLX0
-
-{
-  "name": "Kopi Robusta",
-  "unit_of_measurement": "gram",
-  "description": "Biji kopi Robusta dengan rasa kuat"
-}
-
-### Delete Raw Material (Protected)
-DELETE http://localhost:8080/api/raw-materials/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzY3MDM1MDB9.js-X2xIOYiKpiMTUuckqtPazURGgIIRyGQEp0IOPLX0
-
-### Add Raw Material Batch (Protected)
 POST http://localhost:8080/api/raw-material-batches
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzY3MDU5MTR9.zQiHLLzfvONBgvDBTVlgPtTlCpZqEcQKcXVuM_9lWrg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxODIxNTJ9.P_krgHaqm3Z_uQUSznVWSWrmD5o8f_b8R1teAszIgWk
 
 {
-  "raw_material_id": 2,
-  "batch_code": "BATCH123",
-  "quantity": 100,
-  "received_date": "2025-01-10 00:00:00"
+  "raw_material_id": 1,
+  "batch_code": "BATCH_NEW",
+  "quantity": 200,
+  "received_date": "2025-01-17 00:00:00"
 }
 
 
-### Get All Raw Material Batches (Protected)
-GET http://localhost:8080/api/raw-material-batches
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzY3MDM1MDB9.js-X2xIOYiKpiMTUuckqtPazURGgIIRyGQEp0IOPLX0
-
-### Delete Raw Material Batch (Protected)
-DELETE http://localhost:8080/api/raw-material-batches/2
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzY3MDM1MDB9.js-X2xIOYiKpiMTUuckqtPazURGgIIRyGQEp0IOPLX0

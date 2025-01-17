@@ -8,14 +8,13 @@ import (
 )
 
 type TransactionController struct {
-	transactionService services.TransactionService
+	service services.TransactionService
 }
 
-func NewTransactionController(transactionService services.TransactionService) *TransactionController {
-	return &TransactionController{transactionService}
+func NewTransactionController(service services.TransactionService) *TransactionController {
+	return &TransactionController{service}
 }
 
-// CreateTransaction handles creating a new transaction
 func (c *TransactionController) CreateTransaction(ctx *gin.Context) {
 	var input services.TransactionInput
 	if err := ctx.ShouldBindJSON(&input); err != nil {
@@ -23,7 +22,7 @@ func (c *TransactionController) CreateTransaction(ctx *gin.Context) {
 		return
 	}
 
-	transaction, err := c.transactionService.CreateTransaction(input)
+	transaction, err := c.service.CreateTransaction(input)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -32,9 +31,8 @@ func (c *TransactionController) CreateTransaction(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, transaction)
 }
 
-// GetAllTransactions fetches all transactions
 func (c *TransactionController) GetAllTransactions(ctx *gin.Context) {
-	transactions, err := c.transactionService.GetAllTransactions()
+	transactions, err := c.service.GetAllTransactions()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

@@ -19,18 +19,27 @@ func main() {
 	productRepo := repositories.NewProductRepository(db)
 	rawMaterialRepo := repositories.NewRawMaterialRepository(db)
 	rawMaterialBatchRepo := repositories.NewRawMaterialBatchRepository(db)
+	productRecipeRepo := repositories.NewProductRecipeRepository(db)
+	inventoryRepo := repositories.NewInventoryLogRepository(db)
+	transactionRepo := repositories.NewTransactionRepository(db)
 
 	// Services
 	authService := services.NewAuthService(userRepo)
-	productService := services.NewProductService(productRepo)
+	productService := services.NewProductService(productRepo, inventoryRepo)
 	rawMaterialService := services.NewRawMaterialService(rawMaterialRepo)
-	rawMaterialBatchService := services.NewRawMaterialBatchService(rawMaterialBatchRepo)
+	rawMaterialBatchService := services.NewRawMaterialBatchService(rawMaterialBatchRepo, rawMaterialRepo, inventoryRepo)
+	productRecipeService := services.NewProductRecipeService(productRecipeRepo, productRepo, rawMaterialRepo)
+	inventoryService := services.NewInventoryService(inventoryRepo)
+	transactionService := services.NewTransactionService(transactionRepo, productRepo, inventoryRepo, productRecipeRepo, rawMaterialRepo)
 
 	// Controllers
 	authController := controllers.NewAuthController(authService)
 	productController := controllers.NewProductController(productService)
 	rawMaterialController := controllers.NewRawMaterialController(rawMaterialService)
 	rawMaterialBatchController := controllers.NewRawMaterialBatchController(rawMaterialBatchService)
+	productRecipeController := controllers.NewProductRecipeController(productRecipeService)
+	inventoryController := controllers.NewInventoryController(inventoryService)
+	transactionController := controllers.NewTransactionController(transactionService)
 
 	router := gin.Default()
 
@@ -57,6 +66,21 @@ func main() {
 	protected.POST("/raw-material-batches", rawMaterialBatchController.Create)
 	protected.GET("/raw-material-batches", rawMaterialBatchController.GetAll)
 	protected.DELETE("/raw-material-batches/:id", rawMaterialBatchController.Delete)
+
+	// ✅ Product Recipe Routes
+	protected.GET("/product-recipes", productRecipeController.GetAll)
+	protected.GET("/product-recipes/:id", productRecipeController.GetByID)
+	protected.POST("/product-recipes", productRecipeController.Create)
+	protected.PUT("/product-recipes/:id", productRecipeController.Update)
+	protected.DELETE("/product-recipes/:id", productRecipeController.Delete)
+
+	// ✅ Inventory Log Routes
+	protected.POST("/inventory", inventoryController.AddLog)
+	protected.GET("/inventory", inventoryController.GetCurrentStock)
+
+	// ✅ Transaction Routes
+	protected.POST("/transactions", transactionController.CreateTransaction)
+	protected.GET("/transactions", transactionController.GetAllTransactions)
 
 	// Jalankan server di port 8080
 	router.Run(":8080")

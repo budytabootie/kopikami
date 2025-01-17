@@ -6,13 +6,15 @@ import (
 )
 
 type RawMaterialBatchRepository interface {
-    Create(batch *models.RawMaterialBatch) error
-    FindAll() ([]models.RawMaterialBatch, error)
-    FindByID(id uint) (models.RawMaterialBatch, error)
-    FindByRawMaterialID(rawMaterialID uint) ([]models.RawMaterialBatch, error)
-    Update(batch *models.RawMaterialBatch) error
-    Delete(id uint) error
+	Create(batch *models.RawMaterialBatch) error
+	FindAll() ([]models.RawMaterialBatch, error)
+	FindByID(id uint) (models.RawMaterialBatch, error)
+	FindByRawMaterialID(rawMaterialID uint) ([]models.RawMaterialBatch, error)
+	Update(batch *models.RawMaterialBatch) error
+	Delete(id uint) error
+	FindLogsByBatchID(batchID uint) ([]models.InventoryLog, error) // Tambahkan ini
 }
+
 
 type rawMaterialBatchRepository struct {
     db *gorm.DB
@@ -43,6 +45,13 @@ func (r *rawMaterialBatchRepository) FindByRawMaterialID(rawMaterialID uint) ([]
     err := r.db.Where("raw_material_id = ?", rawMaterialID).Find(&batches).Error
     return batches, err
 }
+
+func (r *rawMaterialBatchRepository) FindLogsByBatchID(batchID uint) ([]models.InventoryLog, error) {
+	var logs []models.InventoryLog
+	err := r.db.Where("reference_id = ? AND type = ?", batchID, "raw_material").Find(&logs).Error
+	return logs, err
+}
+
 
 func (r *rawMaterialBatchRepository) Update(batch *models.RawMaterialBatch) error {
     return r.db.Save(batch).Error

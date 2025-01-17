@@ -2,9 +2,9 @@ package config
 
 import (
 	"fmt"
+	"kopikami/models"
 	"log"
 	"os"
-	"kopikami/models"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -23,9 +23,20 @@ func SetupDatabaseConnection() *gorm.DB {
 		log.Fatalf("Error connecting to database: %v", err)
 	}
 
-	// ✅ Menjalankan migrasi otomatis untuk tabel Product
-	database.AutoMigrate(&models.Product{})
-	log.Println("Database migrated successfully!")
+	// Menjalankan migrasi otomatis untuk semua tabel
+	if err := database.AutoMigrate(
+		&models.User{},
+		&models.Product{},
+		&models.RawMaterial{},
+		&models.RawMaterialBatch{},
+		&models.ProductRecipe{},
+		&models.Transaction{},
+		&models.TransactionItem{},
+		&models.InventoryLog{},
+	); err != nil {
+		log.Fatalf("Error migrating database: %v", err)
+	}
+	log.Println("Database migrated successfully for all models!")
 
 	return database
 }

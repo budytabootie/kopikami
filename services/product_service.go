@@ -24,12 +24,16 @@ type ProductService interface {
 // productService adalah implementasi dari ProductService yang menggunakan ProductRepository
 // untuk melakukan operasi CRUD pada produk
 type productService struct {
-	productRepo repositories.ProductRepository
+	productRepo   repositories.ProductRepository
+	inventoryRepo repositories.InventoryLogRepository // Ditambahkan
 }
 
 // NewProductService membuat instance baru dari ProductService
-func NewProductService(productRepo repositories.ProductRepository) ProductService {
-	return &productService{productRepo}
+func NewProductService(productRepo repositories.ProductRepository, inventoryRepo repositories.InventoryLogRepository) ProductService {
+	return &productService{
+		productRepo:   productRepo,
+		inventoryRepo: inventoryRepo,
+	}
 }
 
 // GetAllProducts mengambil semua produk yang tersedia di database
@@ -63,12 +67,26 @@ func (s *productService) UpdateProduct(id uint, input ProductInput) (*models.Pro
 		return nil, errors.New("product not found")
 	}
 
+	stockChange := input.Stock - product.Stock
 	product.Name = input.Name
 	product.Price = input.Price
 	product.Stock = input.Stock
 
 	if err := s.productRepo.Update(&product); err != nil {
 		return nil, err
+	}
+
+	// Tambahkan log penambahan stok ke inventory_logs
+	if stockChange > 0 {
+		log := models.InventoryLog{
+			Type:         "product",
+			ReferenceID:  product.ID,
+			ChangeAmount: stockChange,
+			Description:  "Stock addition via product update",
+		}
+		if err := s.inventoryRepo.Create(&log); err != nil {
+			return nil, errors.New("failed to create inventory log")
+		}
 	}
 
 	return &product, nil

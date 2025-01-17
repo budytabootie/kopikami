@@ -16,25 +16,49 @@ type RawMaterialBatchService interface {
 }
 
 type rawMaterialBatchService struct {
-    repo repositories.RawMaterialBatchRepository
+    repo            repositories.RawMaterialBatchRepository
+    rawMaterialRepo repositories.RawMaterialRepository
+    inventoryRepo   repositories.InventoryLogRepository
 }
 
-func NewRawMaterialBatchService(repo repositories.RawMaterialBatchRepository) RawMaterialBatchService {
-    return &rawMaterialBatchService{repo}
+func NewRawMaterialBatchService(
+    repo repositories.RawMaterialBatchRepository,
+    rawMaterialRepo repositories.RawMaterialRepository,
+    inventoryRepo repositories.InventoryLogRepository,
+) RawMaterialBatchService {
+    return &rawMaterialBatchService{repo, rawMaterialRepo, inventoryRepo}
 }
 
 func (s *rawMaterialBatchService) Create(batch models.RawMaterialBatch) (*models.RawMaterialBatch, error) {
+    // Validasi keberadaan Raw Material
+    if _, err := s.rawMaterialRepo.FindByID(batch.RawMaterialID); err != nil {
+        return nil, errors.New("raw material not found")
+    }
+
+    // Validasi Quantity
     if batch.Quantity <= 0 {
         return nil, errors.New("quantity must be greater than zero")
     }
 
-    // ✅ Validasi hanya jika nilai tanggal benar-benar kosong
-    if batch.ReceivedDate == nil {
-        return nil, errors.New("received date is required")
+    // Simpan batch ke database
+    err := s.repo.Create(&batch)
+    if err != nil {
+        return nil, err
     }
 
-    err := s.repo.Create(&batch)
-    return &batch, err
+    // Tambahkan log ke inventory_logs
+    log := models.InventoryLog{
+        Type:         "raw_material",
+        ReferenceID:  batch.RawMaterialID,
+        ChangeAmount: batch.Quantity,
+        Description:  "Stock addition via batch creation",
+    }
+
+    if err := s.inventoryRepo.Create(&log); err != nil {
+        return nil, errors.New("failed to create inventory log")
+    }
+
+    return &batch, nil
 }
 
 func (s *rawMaterialBatchService) GetAll() ([]models.RawMaterialBatch, error) {
@@ -51,14 +75,33 @@ func (s *rawMaterialBatchService) GetByRawMaterialID(rawMaterialID uint) ([]mode
 }
 
 func (s *rawMaterialBatchService) Update(id uint, batch models.RawMaterialBatch) error {
+    existingBatch, err := s.GetByID(id)
+    if err != nil {
+        return errors.New("batch not found")
+    }
+
+    existingBatch.Quantity = batch.Quantity
+    existingBatch.ReceivedDate = batch.ReceivedDate
+    existingBatch.ExpirationDate = batch.ExpirationDate
+
+    return s.repo.Update(existingBatch)
+}
+
+func (s *rawMaterialBatchService) Delete(id uint) error {
+    // Validasi apakah batch ada
     _, err := s.GetByID(id)
     if err != nil {
         return errors.New("batch not found")
     }
-    batch.ID = id
-    return s.repo.Update(&batch)
-}
 
-func (s *rawMaterialBatchService) Delete(id uint) error {
+    // Validasi apakah batch sedang digunakan
+    inventoryLogs, err := s.repo.FindLogsByBatchID(id)
+    if err != nil {
+        return errors.New("failed to check batch usage")
+    }
+    if len(inventoryLogs) > 0 {
+        return errors.New("cannot delete batch, it is currently in use")
+    }
+
     return s.repo.Delete(id)
 }

@@ -4,49 +4,44 @@ import (
 	"errors"
 	"kopikami/models"
 	"kopikami/repositories"
-	"time"
 )
 
 type InventoryInput struct {
-	ProductID uint      `json:"product_id" binding:"required"`
-	BatchCode string    `json:"batch_code" binding:"required"`
-	Quantity  int       `json:"quantity" binding:"required,gte=0"`
-	ExpiredAt *time.Time `json:"expired_at"`
+	Type         string `json:"type" binding:"required,oneof=raw_material product"`
+	ReferenceID  uint   `json:"reference_id" binding:"required"`
+	ChangeAmount int    `json:"change_amount" binding:"required"`
+	Description  string `json:"description"`
 }
 
 type InventoryService interface {
-	AddInventory(input InventoryInput) (*models.Inventory, error)
-	GetInventoryByProduct(productID uint) ([]models.Inventory, error)
+	AddLog(input InventoryInput) (*models.InventoryLog, error)
+	GetCurrentStock(logType string, referenceID uint) (int, error)
 }
 
 type inventoryService struct {
-	inventoryRepo repositories.InventoryRepository
+	repo repositories.InventoryLogRepository
 }
 
-func NewInventoryService(inventoryRepo repositories.InventoryRepository) InventoryService {
-	return &inventoryService{inventoryRepo}
+func NewInventoryService(repo repositories.InventoryLogRepository) InventoryService {
+	return &inventoryService{repo}
 }
 
-func (s *inventoryService) AddInventory(input InventoryInput) (*models.Inventory, error) {
-	if input.Quantity < 0 {
-		return nil, errors.New("quantity cannot be negative")
+func (s *inventoryService) AddLog(input InventoryInput) (*models.InventoryLog, error) {
+	if input.ChangeAmount == 0 {
+		return nil, errors.New("change amount cannot be zero")
 	}
 
-	inventory := models.Inventory{
-		ProductID: input.ProductID,
-		BatchCode: input.BatchCode,
-		Quantity:  input.Quantity,
-		ExpiredAt: input.ExpiredAt,
+	log := models.InventoryLog{
+		Type:         input.Type,
+		ReferenceID:  input.ReferenceID,
+		ChangeAmount: input.ChangeAmount,
+		Description:  input.Description,
 	}
 
-	err := s.inventoryRepo.AddBatch(&inventory)
-	if err != nil {
-		return nil, err
-	}
-
-	return &inventory, nil
+	err := s.repo.Create(&log)
+	return &log, err
 }
 
-func (s *inventoryService) GetInventoryByProduct(productID uint) ([]models.Inventory, error) {
-	return s.inventoryRepo.GetInventoryByProduct(productID)
+func (s *inventoryService) GetCurrentStock(logType string, referenceID uint) (int, error) {
+	return s.repo.GetCurrentStockByTypeAndID(logType, referenceID)
 }
