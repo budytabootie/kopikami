@@ -8,18 +8,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// JWTMiddleware adalah middleware yang memvalidasi token JWT untuk endpoint yang dilindungi
 func JWTMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		// Mengambil token dari header Authorization
 		tokenHeader := ctx.GetHeader("Authorization")
 
-		// Cek apakah token dikirim
+		// Cek apakah token dikirim atau tidak
 		if tokenHeader == "" {
 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Token required"})
 			ctx.Abort()
 			return
 		}
 
-		// Validasi format "Bearer <token>"
+		// Memisahkan token dengan format "Bearer <token>"
 		splitToken := strings.Split(tokenHeader, " ")
 		if len(splitToken) != 2 || splitToken[0] != "Bearer" {
 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token format"})
@@ -27,7 +29,7 @@ func JWTMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// Validasi token JWT
+		// Validasi token JWT menggunakan utilitas
 		token := splitToken[1]
 		if _, err := utils.ValidateJWT(token); err != nil {
 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
@@ -35,6 +37,7 @@ func JWTMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		// Jika token valid, lanjutkan ke handler berikutnya
 		ctx.Next()
 	}
 }

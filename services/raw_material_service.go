@@ -1,42 +1,58 @@
 package services
 
 import (
-	"kopikami/models"
-	"kopikami/repositories"
+    "errors"
+    "kopikami/models"
+    "kopikami/repositories"
 )
 
-type RawMaterialInput struct {
-	Name string `json:"name" binding:"required"`
-	Unit string `json:"unit" binding:"required"`
-}
-
 type RawMaterialService interface {
-	CreateMaterial(input RawMaterialInput) (*models.RawMaterial, error)
-	GetAllMaterials() ([]models.RawMaterial, error)
+    Create(material models.RawMaterial) (*models.RawMaterial, error)
+    GetAll() ([]models.RawMaterial, error)
+    GetByID(id uint) (*models.RawMaterial, error)
+    Update(id uint, material models.RawMaterial) error
+    Delete(id uint) error
 }
 
 type rawMaterialService struct {
-	materialRepo repositories.RawMaterialRepository
+    repo repositories.RawMaterialRepository
 }
 
-func NewRawMaterialService(materialRepo repositories.RawMaterialRepository) RawMaterialService {
-	return &rawMaterialService{materialRepo}
+func NewRawMaterialService(repo repositories.RawMaterialRepository) RawMaterialService {
+    return &rawMaterialService{repo}
 }
 
-func (s *rawMaterialService) CreateMaterial(input RawMaterialInput) (*models.RawMaterial, error) {
-	material := models.RawMaterial{
-		Name: input.Name,
-		Unit: input.Unit,
-	}
-
-	err := s.materialRepo.Create(&material)
-	if err != nil {
-		return nil, err
-	}
-
-	return &material, nil
+func (s *rawMaterialService) Create(material models.RawMaterial) (*models.RawMaterial, error) {
+    // ✅ Validasi data yang benar
+    if material.Name == "" || material.UnitOfMeasurement == "" {
+        return nil, errors.New("name and unit of measurement are required")
+    }
+    err := s.repo.Create(&material)
+    return &material, err
 }
 
-func (s *rawMaterialService) GetAllMaterials() ([]models.RawMaterial, error) {
-	return s.materialRepo.GetAll()
+func (s *rawMaterialService) GetAll() ([]models.RawMaterial, error) {
+    return s.repo.FindAll()
+}
+
+func (s *rawMaterialService) GetByID(id uint) (*models.RawMaterial, error) {
+    material, err := s.repo.FindByID(id)
+    return &material, err
+}
+
+func (s *rawMaterialService) Update(id uint, material models.RawMaterial) error {
+    existingMaterial, err := s.GetByID(id)
+    if err != nil {
+        return errors.New("material not found")
+    }
+
+    // ✅ Hindari overwriting `created_at`
+    material.CreatedAt = existingMaterial.CreatedAt
+    material.ID = id
+    return s.repo.Update(&material)
+}
+
+
+func (s *rawMaterialService) Delete(id uint) error {
+    return s.repo.Delete(id)
 }
