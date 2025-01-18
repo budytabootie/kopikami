@@ -1,17 +1,22 @@
 package services
 
 import (
-	"errors"
 	"kopikami/models"
 	"kopikami/repositories"
 	"time"
 )
 
 type SalesReport struct {
-	TotalRevenue       float64 `json:"total_revenue"`
-	TotalTransactions  int     `json:"total_transactions"`
-	BestSellingProduct string  `json:"best_selling_product"`
-	QuantitySold       int     `json:"quantity_sold"`
+	TotalRevenue       float64              `json:"total_revenue"`
+	TotalTransactions  int                  `json:"total_transactions"`
+	TopSellingProducts []TopSellingProduct `json:"top_selling_products"`
+}
+
+type TopSellingProduct struct {
+	ProductID uint    `json:"product_id"`
+	Name      string  `json:"name"`
+	Quantity  int     `json:"quantity"`
+	Revenue   float64 `json:"revenue"`
 }
 
 type StockReport struct {
@@ -38,59 +43,63 @@ func NewReportService(repo repositories.ReportRepository) ReportService {
 	return &reportService{repo}
 }
 
+// GenerateSalesReport creates a sales report based on the given date range
 func (s *reportService) GenerateSalesReport(startDate, endDate time.Time) (*SalesReport, error) {
+	// Fetch transactions
 	transactions, err := s.repo.GetSalesReport(startDate, endDate)
 	if err != nil {
 		return nil, err
 	}
 
-	totalRevenue := 0.0
-	totalTransactions := len(transactions)
-	productSales := make(map[string]int)
-
-	for _, transaction := range transactions {
-		for _, item := range transaction.Items {
-			if item.Product == nil {
-				return nil, errors.New("product data is missing in transaction item")
-			}
-			productSales[item.Product.Name] += item.Quantity
-			totalRevenue += float64(item.Quantity) * item.Price
-		}
+	// Fetch top-selling products
+	topProductsRepo, err := s.repo.GetTopSellingProducts(startDate, endDate)
+	if err != nil {
+		return nil, err
 	}
 
-	bestSellingProduct := ""
-	quantitySold := 0
-	for product, quantity := range productSales {
-		if quantity > quantitySold {
-			bestSellingProduct = product
-			quantitySold = quantity
-		}
+	// Convert repository result to service struct
+	topProducts := []TopSellingProduct{}
+	for _, p := range topProductsRepo {
+		topProducts = append(topProducts, TopSellingProduct{
+			ProductID: p.ProductID,
+			Name:      p.Name,
+			Quantity:  p.Quantity,
+			Revenue:   p.Revenue,
+		})
+	}
+
+	// Calculate total revenue
+	totalRevenue := 0.0
+	for _, transaction := range transactions {
+		totalRevenue += transaction.TotalAmount
 	}
 
 	return &SalesReport{
 		TotalRevenue:       totalRevenue,
-		TotalTransactions:  totalTransactions,
-		BestSellingProduct: bestSellingProduct,
-		QuantitySold:       quantitySold,
+		TotalTransactions:  len(transactions),
+		TopSellingProducts: topProducts,
 	}, nil
 }
 
+// GenerateStockReport creates a stock report for all products and raw materials
 func (s *reportService) GenerateStockReport() (*StockReport, error) {
+	// Fetch product and raw material stock data
 	products, rawMaterials, err := s.repo.GetStockReport()
 	if err != nil {
 		return nil, err
 	}
 
+	// Prepare raw material stock details
 	rawMaterialStocks := []RawMaterialStock{}
 	for _, material := range rawMaterials {
 		batches := []models.RawMaterialBatch{}
 		stock := 0
+
 		for _, batch := range material.Batches {
 			stock += batch.Quantity
-			// Set field IsNearExpiry
-			batch.IsNearExpiry = batch.ExpirationDate != nil && batch.ExpirationDate.Before(time.Now().AddDate(0, 1, 0))
 			batches = append(batches, batch)
 		}
+
 		rawMaterialStocks = append(rawMaterialStocks, RawMaterialStock{
 			Name:    material.Name,
 			Stock:   stock,
@@ -103,4 +112,3 @@ func (s *reportService) GenerateStockReport() (*StockReport, error) {
 		RawMaterials: rawMaterialStocks,
 	}, nil
 }
-

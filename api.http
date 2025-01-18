@@ -1,5 +1,9 @@
-### Pembuatan User Baru
-POST http://localhost:8080/api/auth/register
+# Base URL dan Token JWT
+@baseUrl = http://localhost:8080
+@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcyMTczOTl9.xhj5V57s2gtshMa7CsoVvJzt1OtKYzcuckC9zRBlR1s
+
+### 1. Register User
+POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
 {
@@ -11,8 +15,8 @@ Content-Type: application/json
 
 ###
 
-### Login User (Mendapatkan Token JWT)
-POST http://localhost:8080/api/auth/login
+### 2. Login User (Get JWT Token)
+POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
@@ -22,10 +26,10 @@ Content-Type: application/json
 
 ###
 
-### Menambahkan Produk
-POST http://localhost:8080/api/products
+### 3. Create Product
+POST {{baseUrl}}/api/products
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxOTk0NjZ9.-hrb5vlrvcmAc3fM6JmW81R7Fv7f8cruuvjeiowixxs
+Authorization: {{token}}
 
 {
   "name": "Espresso",
@@ -35,56 +39,99 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb
 
 ###
 
-### Menambahkan Raw Material
-POST http://localhost:8080/api/raw-materials
+### 4. Get All Products
+GET {{baseUrl}}/api/products
+Authorization: {{token}}
+
+###
+
+### 5. Update Product
+PUT {{baseUrl}}/api/products/1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxOTk0NjZ9.-hrb5vlrvcmAc3fM6JmW81R7Fv7f8cruuvjeiowixxs
+Authorization: {{token}}
 
 {
-  "name": "Kopi Arabika",
-  "unit_of_measurement": "kg",
-  "description": "Biji kopi Arabika berkualitas"
+  "name": "Espresso Premium",
+  "price": 30000,
+  "stock": 150
 }
 
 ###
 
-### Menambahkan Batch Raw Material
-POST http://localhost:8080/api/raw-material-batches
+### 6. Delete Product
+DELETE {{baseUrl}}/api/products/1
+Authorization: {{token}}
+
+###
+
+### 7. Add Raw Material
+POST {{baseUrl}}/api/raw-materials
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxOTk0NjZ9.-hrb5vlrvcmAc3fM6JmW81R7Fv7f8cruuvjeiowixxs
+Authorization: {{token}}
+
+{
+  "name": "Coffee Beans",
+  "unit_of_measurement": "gram",
+  "description": "High-quality coffee beans"
+}
+
+###
+
+### 8. Get All Raw Materials
+GET {{baseUrl}}/api/raw-materials
+Authorization: {{token}}
+
+###
+
+### 9. Add Raw Material Batch
+POST {{baseUrl}}/api/raw-material-batches
+Content-Type: application/json
+Authorization: {{token}}
 
 {
   "raw_material_id": 1,
   "batch_code": "BATCH001",
-  "quantity": 50,
+  "quantity": 500,
   "received_date": "2025-01-17 00:00:00"
 }
 
 ###
 
-### Menambahkan Resep Produk
-POST http://localhost:8080/api/product-recipes
+### 10. Get All Raw Material Batches
+GET {{baseUrl}}/api/raw-material-batches
+Authorization: {{token}}
+
+###
+
+### 11. Create Product Recipe
+POST {{baseUrl}}/api/product-recipes
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxOTk0NjZ9.-hrb5vlrvcmAc3fM6JmW81R7Fv7f8cruuvjeiowixxs
+Authorization: {{token}}
 
 {
-  "product_id": 1,
+  "product_id": 2,
   "raw_material_id": 1,
-  "quantity": 1
+  "quantity": 50
 }
 
 ###
 
-### Melakukan Transaksi
-POST http://localhost:8080/api/transactions
+### 12. Get All Product Recipes
+GET {{baseUrl}}/api/product-recipes
+Authorization: {{token}}
+
+###
+
+### 13. Create Transaction
+POST {{baseUrl}}/api/transactions
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxOTk0NjZ9.-hrb5vlrvcmAc3fM6JmW81R7Fv7f8cruuvjeiowixxs
+Authorization: {{token}}
 
 {
   "user_id": 1,
   "items": [
     {
-      "product_id": 1,
+      "product_id": 2,
       "quantity": 2
     }
   ]
@@ -92,37 +139,43 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb
 
 ###
 
-### Melihat Semua Transaksi
-GET http://localhost:8080/api/transactions
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxOTk0NjZ9.-hrb5vlrvcmAc3fM6JmW81R7Fv7f8cruuvjeiowixxs
+### 14. Get All Transactions
+GET {{baseUrl}}/api/transactions
+Authorization: {{token}}
 
 ###
 
-### Mengecek Stok Produk
-GET http://localhost:8080/api/inventory?type=product&reference_id=1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxOTk0NjZ9.-hrb5vlrvcmAc3fM6JmW81R7Fv7f8cruuvjeiowixxs
-
-
-### Mengecek Stok Raw Material
-GET http://localhost:8080/api/inventory?type=raw_material&reference_id=1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxOTk0NjZ9.-hrb5vlrvcmAc3fM6JmW81R7Fv7f8cruuvjeiowixxs
+### 15. Get Inventory (Check Stock for Product)
+GET {{baseUrl}}/api/inventory?type=product&reference_id=1
+Authorization: {{token}}
 
 ###
 
-### Melihat Laporan Penjualan
-GET http://localhost:8080/api/reports/sales
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxOTk0NjZ9.-hrb5vlrvcmAc3fM6JmW81R7Fv7f8cruuvjeiowixxs
-
-start_date: 2025-01-01
-end_date: 2025-01-17
-
-###
-GET http://localhost:8080/api/reports/sales?start_date=2025-01-01&end_date=2025-01-17
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxOTk0NjZ9.-hrb5vlrvcmAc3fM6JmW81R7Fv7f8cruuvjeiowixxs
-
+### 16. Get Sales Report
+GET {{baseUrl}}/api/reports/sales?start_date=2025-01-01&end_date=2025-01-17
+Authorization: {{token}}
 
 ###
 
-### Melihat Laporan Stok
-GET http://localhost:8080/api/reports/stock
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcxOTk0NjZ9.-hrb5vlrvcmAc3fM6JmW81R7Fv7f8cruuvjeiowixxs
+### 17. Get Stock Report
+GET {{baseUrl}}/api/reports/stock
+Authorization: {{token}}
+
+###
+
+### 18. Get Sales Stats (Dashboard)
+GET {{baseUrl}}/api/dashboard/sales-stats
+Authorization: {{token}}
+
+###
+
+### 19. Get Inventory Stats (Dashboard)
+GET {{baseUrl}}/api/dashboard/inventory-stats
+Authorization: {{token}}
+
+###
+
+### 20. Get Sales Trends (Dashboard)
+GET {{baseUrl}}/api/dashboard/trends?start_date=2025-01-01&end_date=2025-01-17
+Authorization: {{token}}
+

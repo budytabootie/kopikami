@@ -57,3 +57,11 @@ func (c *AuthController) Login(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"token": token})
 }
+
+func (c *AuthController) Logout(ctx *gin.Context) {
+    // Opsional: Blacklist token jika implementasi ada.
+    ctx.JSON(http.StatusOK, gin.H{
+        "message": "Logout successful",
+    })
+}
+

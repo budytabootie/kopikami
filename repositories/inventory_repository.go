@@ -3,6 +3,7 @@ package repositories
 import (
 	"errors"
 	"kopikami/models"
+
 	"gorm.io/gorm"
 )
 
@@ -20,6 +21,7 @@ func NewInventoryRepository(db *gorm.DB) InventoryRepository {
 	return &inventoryRepository{db}
 }
 
+// Tambahkan batch inventory baru
 func (r *inventoryRepository) AddBatch(batch *models.Inventory) error {
 	var existingBatch models.Inventory
 	if err := r.db.Where("batch_code = ?", batch.BatchCode).First(&existingBatch).Error; err == nil {
@@ -28,12 +30,14 @@ func (r *inventoryRepository) AddBatch(batch *models.Inventory) error {
 	return r.db.Create(batch).Error
 }
 
+// Ambil data inventory berdasarkan product_id
 func (r *inventoryRepository) GetInventoryByProduct(productID uint) ([]models.Inventory, error) {
 	var inventories []models.Inventory
 	err := r.db.Where("product_id = ?", productID).Order("expired_at ASC").Find(&inventories).Error
 	return inventories, err
 }
 
+// Update stok inventory berdasarkan batch ID
 func (r *inventoryRepository) UpdateStock(batchID uint, quantity int) error {
 	var inventory models.Inventory
 	if err := r.db.First(&inventory, batchID).Error; err != nil {

@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"kopikami/models"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -10,6 +9,7 @@ import (
 type TransactionRepository interface {
 	Create(transaction *models.Transaction) error
 	FindAll() ([]models.Transaction, error)
+	FindByUserID(userID uint) ([]models.Transaction, error)
 }
 
 type transactionRepository struct {
@@ -25,15 +25,13 @@ func (r *transactionRepository) Create(transaction *models.Transaction) error {
 }
 
 func (r *transactionRepository) FindAll() ([]models.Transaction, error) {
-    var transactions []models.Transaction
-    err := r.db.Preload("Items.Product").Find(&transactions).Error
-    return transactions, err
+	var transactions []models.Transaction
+	err := r.db.Preload("Items.Product").Find(&transactions).Error
+	return transactions, err
 }
 
-func (r *transactionRepository) FindByDateRange(startDate, endDate time.Time) ([]models.Transaction, error) {
-    var transactions []models.Transaction
-    err := r.db.Preload("Items.Product").
-        Where("created_at BETWEEN ? AND ?", startDate, endDate).
-        Find(&transactions).Error
-    return transactions, err
+func (r *transactionRepository) FindByUserID(userID uint) ([]models.Transaction, error) {
+	var transactions []models.Transaction
+	err := r.db.Where("user_id = ?", userID).Preload("Items.Product").Find(&transactions).Error
+	return transactions, err
 }

@@ -1,0 +1,243 @@
+# Base URL dan Token JWT
+@baseUrl = http://localhost:8080
+@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzcyMTczOTl9.xhj5V57s2gtshMa7CsoVvJzt1OtKYzcuckC9zRBlR1s
+
+### 1. Register User as Admin
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Admin User New1",
+  "email": "adminuser1@example.com",
+  "password": "password123",
+  "role": "admin"
+}
+
+###
+
+### 2. Register User as Cashier
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Cashier User 1",
+  "email": "cashieuser@example.com",
+  "password": "cashierpassword",
+  "role": "cashier"
+}
+
+###
+
+### 3. Login as Admin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "adminuser1@example.com",
+  "password": "password123"
+}
+
+### Save Admin Token
+@admin_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MzczMTU3MDV9.SU7v6iYSsRP0Ac0ur5FRjJoGLHr8zme8RcuxLd6oEN0
+###
+
+### 4. Login as Cashier
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "cashieuser@example.com",
+  "password": "cashierpassword"
+}
+
+### Save Cashier Token
+@cashier_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJyb2xlIjoiY2FzaGllciIsImV4cCI6MTczNzMxNDQ1Mn0.TZiKqcYJz4ctokldDwKulx0hQL-qeIYqVfz0FSKmDBI
+
+###
+
+### 5. Admin Creates a Product
+POST {{baseUrl}}/api/admin/products
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "name": "Espresso",
+  "price": 25000,
+  "stock": 100
+}
+
+###
+
+### 6. Admin Retrieves All Products
+GET {{baseUrl}}/api/admin/products
+Authorization: Bearer {{admin_token}}
+
+###
+
+### 7. Admin Updates a Product
+PUT {{baseUrl}}/api/admin/products/1
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "name": "Espresso Premium",
+  "price": 30000,
+  "stock": 150
+}
+
+###
+
+### 8. Admin Deletes a Product
+DELETE {{baseUrl}}/api/admin/products/1
+Authorization: Bearer {{admin_token}}
+
+###
+
+### 9. Add Raw Material
+POST {{baseUrl}}/api/admin/raw-materials
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "name": "Coffee Beans",
+  "unit_of_measurement": "gram",
+  "description": "High-quality coffee beans"
+}
+
+###
+
+### 10. Get All Raw Materials
+GET {{baseUrl}}/api/admin/raw-materials
+Authorization: Bearer {{admin_token}}
+
+###
+
+### 11. Add Raw Material Batch
+POST {{baseUrl}}/api/admin/raw-material-batches
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "raw_material_id": 1,
+  "batch_code": "BATCH002",
+  "quantity": 1000,
+  "received_date": "2025-01-17 00:00:00"
+}
+
+###
+
+### 12. Get All Raw Material Batches
+GET {{baseUrl}}/api/admin/raw-material-batches
+Authorization: Bearer {{admin_token}}
+
+###
+
+### 13. Create Product Recipe
+POST {{baseUrl}}/api/admin/product-recipes
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "product_id": 1,
+  "raw_material_id": 1,
+  "quantity": 50
+}
+
+###
+
+### 14. Get All Product Recipes
+GET {{baseUrl}}/api/admin/product-recipes
+Authorization: Bearer {{admin_token}}
+
+###
+
+### 15. Cashier Creates a Transaction
+POST {{baseUrl}}/api/cashier/transactions
+Content-Type: application/json
+Authorization: Bearer {{cashier_token}}
+
+{
+  "user_id": 2,
+  "items": [
+    {
+      "product_id": 1,
+      "quantity": 2
+    }
+  ]
+}
+
+###
+
+### 16. Cashier Retrieves All Transactions
+GET {{baseUrl}}/api/cashier/transactions
+Authorization: Bearer {{cashier_token}}
+
+###
+
+GET {{baseUrl}}/api/admin/transactions
+Authorization: Bearer {{admin_token}}
+
+
+###
+
+### 17. Get Inventory (Check Stock for Product)
+GET {{baseUrl}}/api/inventory?type=product&reference_id=1
+Authorization: Bearer {{admin_token}}
+
+###
+
+GET {{baseUrl}}/api/inventory?type=product&reference_id=1
+Authorization: Bearer {{cashier_token}}
+
+
+###
+
+### 18. Get Sales Report
+GET {{baseUrl}}/api/admin/reports/sales?start_date=2025-01-01&end_date=2025-01-19
+Authorization: Bearer {{admin_token}}
+
+
+###
+
+### 19. Get Stock Report
+GET {{baseUrl}}/api/admin/reports/stock
+Authorization: Bearer {{admin_token}}
+
+
+###
+
+### 20. Get Sales Stats (Dashboard)
+GET {{baseUrl}}/api/admin/dashboard/sales-stats
+Authorization: Bearer {{admin_token}}
+
+###
+
+### 21. Get Inventory Stats (Dashboard)
+GET {{baseUrl}}/api/admin/dashboard/inventory-stats
+Authorization: Bearer {{admin_token}}
+
+###
+
+### 22. Get Sales Trends (Dashboard)
+GET {{baseUrl}}/api/admin/dashboard/trends?start_date=2025-01-01&end_date=2025-01-19
+Authorization: Bearer {{admin_token}}
+
+###
+
+### 23. Admin Logout
+POST {{baseUrl}}/api/auth/logout
+Authorization: Bearer {{admin_token}}
+
+###
+
+### 24. Cashier Logout
+POST {{baseUrl}}/api/auth/logout
+Authorization: Bearer {{cashier_token}}
+
+###
+
+### Get All Users
+GET {{baseUrl}}/api/admin/users
+Authorization: Bearer {{admin_token}}
+
+
