@@ -1,0 +1,324 @@
+# Base URL dan Token JWT
+@baseUrl = http://localhost:8080
+@admin_token = Bearer <admin_token>
+@cashier_token = Bearer <cashier_token>
+
+#####################################
+# AUTHENTICATION
+#####################################
+
+### 1. Register User
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Admin User",
+  "email": "admin@example.com",
+  "password": "adminpassword",
+  "role": "admin"
+}
+
+###
+
+### 2. Login User (Get JWT Token)
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "adminpassword"
+}
+
+###
+
+### 3. Logout User
+POST {{baseUrl}}/api/auth/logout
+Authorization: {{admin_token}}
+
+###
+
+#####################################
+# USERS (ADMIN ONLY)
+#####################################
+
+### 4. Admin Creates a User
+POST {{baseUrl}}/api/admin/users
+Content-Type: application/json
+Authorization: {{admin_token}}
+
+{
+  "name": "Cashier User",
+  "email": "cashier@example.com",
+  "password": "cashierpassword",
+  "role": "cashier"
+}
+
+###
+
+### 5. Admin Retrieves All Users
+GET {{baseUrl}}/api/admin/users
+Authorization: {{admin_token}}
+
+###
+
+### 6. Admin Retrieves User by ID
+GET {{baseUrl}}/api/admin/users/1
+Authorization: {{admin_token}}
+
+###
+
+### 7. Admin Updates User
+PUT {{baseUrl}}/api/admin/users/1
+Content-Type: application/json
+Authorization: {{admin_token}}
+
+{
+  "name": "Updated User Name",
+  "email": "updated@example.com",
+  "role": "admin"
+}
+
+###
+
+### 8. Admin Deletes User
+DELETE {{baseUrl}}/api/admin/users/1
+Authorization: {{admin_token}}
+
+###
+
+#####################################
+# PRODUCTS
+#####################################
+
+### 9. Admin Creates a Product
+POST {{baseUrl}}/api/admin/products
+Content-Type: application/json
+Authorization: {{admin_token}}
+
+{
+  "name": "Espresso",
+  "price": 25000,
+  "stock": 100
+}
+
+###
+
+### 10. Admin Retrieves All Products
+GET {{baseUrl}}/api/admin/products
+Authorization: {{admin_token}}
+
+###
+
+### 11. Admin Updates a Product
+PUT {{baseUrl}}/api/admin/products/1
+Content-Type: application/json
+Authorization: {{admin_token}}
+
+{
+  "name": "Espresso Updated",
+  "price": 30000,
+  "stock": 150
+}
+
+###
+
+### 12. Admin Deletes a Product
+DELETE {{baseUrl}}/api/admin/products/1
+Authorization: {{admin_token}}
+
+###
+
+#####################################
+# RAW MATERIALS
+#####################################
+
+### 13. Admin Adds a Raw Material
+POST {{baseUrl}}/api/admin/raw-materials
+Content-Type: application/json
+Authorization: {{admin_token}}
+
+{
+  "name": "Coffee Beans",
+  "unit_of_measurement": "gram",
+  "description": "High-quality coffee beans"
+}
+
+###
+
+### 14. Admin Retrieves All Raw Materials
+GET {{baseUrl}}/api/admin/raw-materials
+Authorization: {{admin_token}}
+
+###
+
+### 15. Admin Updates a Raw Material
+PUT {{baseUrl}}/api/admin/raw-materials/1
+Content-Type: application/json
+Authorization: {{admin_token}}
+
+{
+  "name": "Arabica Coffee Beans",
+  "unit_of_measurement": "gram",
+  "description": "Premium quality Arabica beans"
+}
+
+###
+
+### 16. Admin Deletes a Raw Material
+DELETE {{baseUrl}}/api/admin/raw-materials/1
+Authorization: {{admin_token}}
+
+###
+
+#####################################
+# RAW MATERIAL BATCHES
+#####################################
+
+### 17. Admin Adds a Raw Material Batch
+POST {{baseUrl}}/api/admin/raw-material-batches
+Content-Type: application/json
+Authorization: {{admin_token}}
+
+{
+  "raw_material_id": 1,
+  "batch_code": "BATCH001",
+  "quantity": 500,
+  "received_date": "2025-01-01"
+}
+
+###
+
+### 18. Admin Retrieves All Raw Material Batches
+GET {{baseUrl}}/api/admin/raw-material-batches
+Authorization: {{admin_token}}
+
+###
+
+### 19. Admin Deletes a Raw Material Batch
+DELETE {{baseUrl}}/api/admin/raw-material-batches/1
+Authorization: {{admin_token}}
+
+###
+
+#####################################
+# PRODUCT RECIPES
+#####################################
+
+### 20. Admin Adds a Product Recipe
+POST {{baseUrl}}/api/admin/product-recipes
+Content-Type: application/json
+Authorization: {{admin_token}}
+
+{
+  "product_id": 1,
+  "raw_material_id": 1,
+  "quantity": 50
+}
+
+###
+
+### 21. Admin Retrieves All Product Recipes
+GET {{baseUrl}}/api/admin/product-recipes
+Authorization: {{admin_token}}
+
+###
+
+### 22. Admin Updates a Product Recipe
+PUT {{baseUrl}}/api/admin/product-recipes/1
+Content-Type: application/json
+Authorization: {{admin_token}}
+
+{
+  "product_id": 1,
+  "raw_material_id": 1,
+  "quantity": 60
+}
+
+###
+
+### 23. Admin Deletes a Product Recipe
+DELETE {{baseUrl}}/api/admin/product-recipes/1
+Authorization: {{admin_token}}
+
+###
+
+#####################################
+# INVENTORY
+#####################################
+
+### 24. Get Inventory (Check Stock for Product/Raw Material)
+GET {{baseUrl}}/api/inventory?type=product&reference_id=1
+Authorization: {{admin_token}}
+
+###
+
+#####################################
+# TRANSACTIONS
+#####################################
+
+### 25. Admin Retrieves All Transactions
+GET {{baseUrl}}/api/admin/transactions
+Authorization: {{admin_token}}
+
+###
+
+### 26. Cashier Creates a Transaction
+POST {{baseUrl}}/api/cashier/transactions
+Content-Type: application/json
+Authorization: {{cashier_token}}
+
+{
+  "user_id": 2,
+  "items": [
+    {
+      "product_id": 1,
+      "quantity": 2
+    }
+  ]
+}
+
+###
+
+### 27. Cashier Retrieves Their Transactions
+GET {{baseUrl}}/api/cashier/transactions
+Authorization: {{cashier_token}}
+
+###
+
+#####################################
+# REPORTS
+#####################################
+
+### 28. Get Sales Report
+GET {{baseUrl}}/api/admin/reports/sales?start_date=2025-01-01&end_date=2025-01-31
+Authorization: {{admin_token}}
+
+###
+
+### 29. Get Stock Report
+GET {{baseUrl}}/api/admin/reports/stock
+Authorization: {{admin_token}}
+
+###
+
+#####################################
+# DASHBOARD
+#####################################
+
+### 30. Get Sales Stats (Dashboard)
+GET {{baseUrl}}/api/admin/dashboard/sales-stats
+Authorization: {{admin_token}}
+
+###
+
+### 31. Get Inventory Stats (Dashboard)
+GET {{baseUrl}}/api/admin/dashboard/inventory-stats
+Authorization: {{admin_token}}
+
+###
+
+### 32. Get Sales Trends (Dashboard)
+GET {{baseUrl}}/api/admin/dashboard/trends?start_date=2025-01-01&end_date=2025-01-31
+Authorization: {{admin_token}}
+
+###

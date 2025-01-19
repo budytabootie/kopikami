@@ -32,6 +32,7 @@ func main() {
 
 	// Services
 	authService := services.NewAuthService(userRepo)
+	userService := services.NewUserService(userRepo)
 	productService := services.NewProductService(productRepo, inventoryRepo)
 	rawMaterialService := services.NewRawMaterialService(rawMaterialRepo)
 	rawMaterialBatchService := services.NewRawMaterialBatchService(rawMaterialBatchRepo, rawMaterialRepo, inventoryRepo)
@@ -43,6 +44,7 @@ func main() {
 
 	// Controllers
 	authController := controllers.NewAuthController(authService)
+	userController := controllers.NewUserController(userService)
 	productController := controllers.NewProductController(productService)
 	rawMaterialController := controllers.NewRawMaterialController(rawMaterialService)
 	rawMaterialBatchController := controllers.NewRawMaterialBatchController(rawMaterialBatchService)
@@ -78,9 +80,6 @@ func main() {
 	router.POST("/api/auth/login", authController.Login)
 	router.POST("/api/auth/logout", authController.Logout) // Logout route
 
-	router.POST("/api/inventory", inventoryController.AddLog)
-	router.GET("/api/inventory", inventoryController.GetCurrentStock)
-
 	// ✅ Protected Route (Menggunakan Token JWT)
 	protected := router.Group("/api")
 	protected.Use(middlewares.JWTMiddleware())
@@ -88,6 +87,13 @@ func main() {
 	// ✅ Routes untuk Role Admin
 	adminRoutes := protected.Group("/admin") // Tambahkan prefiks /admin
 	adminRoutes.Use(middlewares.RoleMiddleware("admin"))
+
+	adminRoutes.POST("/users", userController.CreateUser)
+	adminRoutes.GET("/users", userController.GetAllUsers)
+	adminRoutes.GET("/users/:id", userController.GetUserByID)
+	adminRoutes.PUT("/users/:id", userController.UpdateUser)
+	adminRoutes.DELETE("/users/:id", userController.DeleteUser)
+
 	adminRoutes.GET("/products", productController.GetAllProducts)
 	adminRoutes.POST("/products", productController.CreateProduct)
 	adminRoutes.PUT("/products/:id", productController.UpdateProduct)
@@ -117,6 +123,9 @@ func main() {
 
 	adminRoutes.GET("/transactions", transactionController.GetAllTransactions)
 
+	adminRoutes.GET("/inventory", inventoryController.GetCurrentStock)
+	adminRoutes.POST("/inventory", inventoryController.AddLog)
+
 	// ✅ Routes untuk Role Kasir
 	cashierRoutes := protected.Group("/cashier") // Tambahkan prefiks /cashier
 	cashierRoutes.Use(middlewares.RoleMiddleware("cashier"))
@@ -131,6 +140,8 @@ func main() {
 		}
 		ctx.JSON(http.StatusOK, transactions)
 	})
+
+	cashierRoutes.GET("/inventory", inventoryController.GetCurrentStock)
 
 	// Jalankan server di port 8080
 	router.Run(":8080")

@@ -240,4 +240,17 @@ Authorization: Bearer {{cashier_token}}
 GET {{baseUrl}}/api/admin/users
 Authorization: Bearer {{admin_token}}
 
+###
+
+POST {{baseUrl}}/api/admin/users
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "name": "New Admin User",
+  "email": "newadmin@example.com",
+  "password": "securepassword",
+  "role": "admin"
+}
+
 

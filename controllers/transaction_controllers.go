@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"kopikami/models"
 	"kopikami/services"
 	"net/http"
@@ -42,15 +41,15 @@ func (c *TransactionController) CreateTransaction(ctx *gin.Context) {
 
 // GetAllTransactions dapat diakses oleh role "admin" dan "cashier"
 func (c *TransactionController) GetAllTransactions(ctx *gin.Context) {
-    fmt.Println("GetAllTransactions endpoint hit") // Log untuk debugging
-    transactions, err := c.service.GetAllTransactions()
-    if err != nil {
-        ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-        return
-    }
+	transactions, err := c.service.GetAllTransactions()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
-    ctx.JSON(http.StatusOK, transactions)
+	ctx.JSON(http.StatusOK, transactions)
 }
+
 
 
 
